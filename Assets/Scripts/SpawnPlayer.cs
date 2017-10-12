@@ -7,8 +7,6 @@ public class SpawnPlayer : MonoBehaviour {
 	private Transform obj;
 	private Vector3 current;
 	private Vector3 offset;
-	private Vector3 oldpos;
-	private Quaternion oldrotation;
 	public Camera maincam;
 	private SpriteRenderer s;
 	private Rigidbody2D r;
@@ -32,20 +30,14 @@ public class SpawnPlayer : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void FixedUpdate () {
+	void Update () {
 		transform.position = obj.transform.position + offset;
 		if (Input.GetKeyDown ("d")) {
 			s.flipX = false;
-			oldpos = obj.transform.position;
-			oldrotation = obj.transform.rotation;
-			//r.AddForce(new Vector2(1000, 0));
 			obj.transform.position = new Vector3 (obj.position.x + 4f, obj.position.y, obj.position.z);
 			obj.transform.rotation = Quaternion.Euler(obj.transform.rotation.x, obj.transform.rotation.y, 0.0f);
 		}
 		if (Input.GetKeyDown ("w")) {
-			oldpos = obj.transform.position;
-			oldrotation = obj.transform.rotation;
-			//r.AddForce(new Vector2 (0, 1000));
 			obj.transform.position = new Vector3 (obj.position.x, obj.position.y+4.0f, obj.position.z); 
 			if(s.flipX == false)
 				obj.transform.rotation = Quaternion.Euler(obj.rotation.x, obj.rotation.y, 90.0f);
@@ -55,29 +47,15 @@ public class SpawnPlayer : MonoBehaviour {
 		if (Input.GetKeyDown ("a")) {
 			s = obj.GetComponent<SpriteRenderer>();
 			s.flipX = true;
-			oldpos = obj.transform.position;
-			oldrotation = obj.transform.rotation;
-			//r.AddForce(new Vector2 (-1000, 0.0f));
 			obj.transform.position = new Vector3 (obj.position.x - 4.4f, obj.position.y, obj.position.z);
 			obj.transform.rotation = Quaternion.Euler(obj.rotation.x, obj.rotation.y, 0.0f);
 		}
 		if (Input.GetKeyDown ("s")) {
-			oldpos = obj.transform.position;
-			oldrotation = obj.transform.rotation;
-			//r.AddForce(new Vector2 (0, -1000));
 			obj.transform.position = new Vector3 (obj.position.x, obj.position.y - 4.0f, obj.position.z);
 			if(s.flipX == false)
 				obj.transform.rotation = Quaternion.Euler(obj.rotation.x, obj.rotation.y, -90.0f);
 			else
 				obj.transform.rotation = Quaternion.Euler(obj.rotation.x, obj.rotation.y, 90.0f);
-		}
-	}
-
-	void OnCollisionEnter2D(Collision2D col){
-		print ("ran");
-		if (col.gameObject.tag == "Wall") {
-			obj.transform.position = oldpos;
-			obj.transform.rotation = oldrotation;
 		}
 	}
 }
