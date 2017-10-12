@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SpawnPlayer : MonoBehaviour {
 	public GameObject Spawns;
-	private Transform obj; //player
+	private Transform PlayerTransform; //player
 	private Transform Troll;
 	private Transform[] Trolls = new Transform[7];
 
@@ -12,7 +12,7 @@ public class SpawnPlayer : MonoBehaviour {
 	private Vector3 offset;
 	public Camera maincam;
 
-	private SpriteRenderer s;//player sprite
+	private SpriteRenderer PlayerSprite;//player sprite
 	public Sprite Tsprite;
 	private SpriteRenderer TrollSprite;
 
@@ -33,11 +33,11 @@ public class SpawnPlayer : MonoBehaviour {
 		random = RandomNumber(random);
 		pastrand [0] = random;
 		print (random);
-		obj = Spawns.transform.GetChild (random);
-		obj.name = "Player";
-		s = obj.GetComponent<SpriteRenderer>();
-		obj.gameObject.AddComponent<Rigidbody2D> ();
-		r = obj.gameObject.GetComponent<Rigidbody2D> ();
+		PlayerTransform = Spawns.transform.GetChild (random);
+		PlayerTransform.name = "Player";
+		PlayerSprite = PlayerTransform.GetComponent<SpriteRenderer>();
+		PlayerTransform.gameObject.AddComponent<Rigidbody2D> ();
+		r = PlayerTransform.gameObject.GetComponent<Rigidbody2D> ();
 		r.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 		r.gravityScale = 0;
 		r.interpolation = RigidbodyInterpolation2D.Extrapolate;
@@ -45,7 +45,7 @@ public class SpawnPlayer : MonoBehaviour {
 
 		//camera setup
 		offset = new Vector3 (0.0f, 0.0f, -1.0f);
-		current = obj.transform.position;
+		current = PlayerTransform.transform.position;
 		current = new Vector3 (current.x, current.y, -1.0f);
 		transform.position = current;
 		maincam.orthographicSize = 20.0f;
@@ -90,7 +90,7 @@ public class SpawnPlayer : MonoBehaviour {
 
 	void TrollMove(){
 		for (int i = 0; i < 7; i++) {
-			int moverand = Random.Range (1, 4);
+			int moverand = Random.Range (1, 5);
 			TrollBody = Trolls [i].gameObject.GetComponent<Rigidbody2D> ();
 			if (moverand == 1) {
 				TrollBody.transform.position = new Vector3 (Trolls[i].position.x + 4.0f, Trolls[i].position.y, Trolls[i].position.z);
@@ -109,35 +109,35 @@ public class SpawnPlayer : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-		transform.position = obj.transform.position + offset;
+		transform.position = PlayerTransform.transform.position + offset;
 		if (Input.GetKeyDown ("d")) {
 			TrollMove ();
-			s.flipX = false;
-			obj.transform.position = new Vector3 (obj.position.x + 4.0f, obj.position.y, obj.position.z);
-			obj.transform.rotation = Quaternion.Euler(obj.transform.rotation.x, obj.transform.rotation.y, 0.0f);
+			PlayerSprite.flipX = false;
+			PlayerTransform.transform.position = new Vector3 (PlayerTransform.position.x + 4.0f, PlayerTransform.position.y, PlayerTransform.position.z);
+			PlayerTransform.transform.rotation = Quaternion.Euler(PlayerTransform.transform.rotation.x, PlayerTransform.transform.rotation.y, 0.0f);
 		}
 		if (Input.GetKeyDown ("w")) {
 			TrollMove ();
-			obj.transform.position = new Vector3 (obj.position.x, obj.position.y+4.0f, obj.position.z); 
-			if(s.flipX == false)
-				obj.transform.rotation = Quaternion.Euler(obj.rotation.x, obj.rotation.y, 90.0f);
+			PlayerTransform.transform.position = new Vector3 (PlayerTransform.position.x, PlayerTransform.position.y+4.0f, PlayerTransform.position.z); 
+			if(PlayerSprite.flipX == false)
+				PlayerTransform.transform.rotation = Quaternion.Euler(PlayerTransform.rotation.x, PlayerTransform.rotation.y, 90.0f);
 			else
-				obj.transform.rotation = Quaternion.Euler(obj.rotation.x, obj.rotation.y, -90.0f);
+				PlayerTransform.transform.rotation = Quaternion.Euler(PlayerTransform.rotation.x, PlayerTransform.rotation.y, -90.0f);
 		}
 		if (Input.GetKeyDown ("a")) {
 			TrollMove ();
-			s = obj.GetComponent<SpriteRenderer>();
-			s.flipX = true;
-			obj.transform.position = new Vector3 (obj.position.x - 4.0f, obj.position.y, obj.position.z);
-			obj.transform.rotation = Quaternion.Euler(obj.rotation.x, obj.rotation.y, 0.0f);
+			PlayerSprite = PlayerTransform.GetComponent<SpriteRenderer>();
+			PlayerSprite.flipX = true;
+			PlayerTransform.transform.position = new Vector3 (PlayerTransform.position.x - 4.0f, PlayerTransform.position.y, PlayerTransform.position.z);
+			PlayerTransform.transform.rotation = Quaternion.Euler(PlayerTransform.rotation.x, PlayerTransform.rotation.y, 0.0f);
 		}
 		if (Input.GetKeyDown ("s")) {
 			TrollMove ();
-			obj.transform.position = new Vector3 (obj.position.x, obj.position.y - 4.0f, obj.position.z);
-			if(s.flipX == false)
-				obj.transform.rotation = Quaternion.Euler(obj.rotation.x, obj.rotation.y, -90.0f);
+			PlayerTransform.transform.position = new Vector3 (PlayerTransform.position.x, PlayerTransform.position.y - 4.0f, PlayerTransform.position.z);
+			if(PlayerSprite.flipX == false)
+				PlayerTransform.transform.rotation = Quaternion.Euler(PlayerTransform.rotation.x, PlayerTransform.rotation.y, -90.0f);
 			else
-				obj.transform.rotation = Quaternion.Euler(obj.rotation.x, obj.rotation.y, 90.0f);
+				PlayerTransform.transform.rotation = Quaternion.Euler(PlayerTransform.rotation.x, PlayerTransform.rotation.y, 90.0f);
 		}
 	}
 }
