@@ -91,6 +91,7 @@ public class SpawnPlayer : MonoBehaviour {
 	}
 
 	void TrollMove(){
+		//raycasting
 		for (int i = 0; i < 7; i++) {
 			int moverand = Random.Range (1, 5);
 			TrollBody = Trolls [i].gameObject.GetComponent<Rigidbody2D> ();
@@ -106,6 +107,13 @@ public class SpawnPlayer : MonoBehaviour {
 			if (moverand == 4) {
 				TrollBody.transform.position = new Vector3 (Trolls[i].position.x, Trolls[i].position.y - 4.0f, Trolls[i].position.z);
 			}
+			RaycastHit2D hit = Physics2D.Raycast (new Vector2(Trolls[i].position.x, Trolls[i].position.y - 2.5f), new Vector2(0, -500), 20.0f);
+			Debug.DrawRay (new Vector3(Trolls [i].position.x, Trolls[i].position.y - 2.5f, 0.0f), new Vector3(0, -500, 0), Color.black, 1.0f, false);
+			if (hit) {
+				if(hit.collider.name == "Player"){
+					TrollCharge (i);
+				}
+			}
 		}
 	}
 
@@ -114,27 +122,7 @@ public class SpawnPlayer : MonoBehaviour {
 	}
 
 	// Update is called once per frame
-	void Update () {
-		//raycasting
-		RaycastHit2D hit;
-		for(int i = 0; i < 7; i++){
-			//Ray2D TrollSightDown = new Ray2D (Trolls[i].position, Vector2.down);
-			//Ray2D TrollSightLeft = new Ray2D (Trolls [i].position, Vector2.left);
-			//Ray2D TrollSightRight = new Ray2D (Trolls [i].position, Vector2.right);
-			//Ray2D TrollSightUp = new Ray2D (Trolls [i].position, Vector2.up);
-			Debug.DrawRay (Trolls [i].position, new Vector3(0, -30, 0), Color.black, 999.0f, false);
-			Debug.DrawRay (Trolls [i].position, new Vector3(0, 30, 0), Color.black, 999.0f, false);
-			Debug.DrawRay (Trolls [i].position, new Vector3(-30, 0, 0), Color.black, 999.0f);
-			Debug.DrawRay (Trolls [i].position, new Vector3(30, 0, 0), Color.black, 999.0f);
-			//Ray2D[] TrollSights = {TrollSightDown, TrollSightLeft, TrollSightRight, TrollSightUp};
-			hit = Physics2D.Raycast(Trolls[i].position, new Vector2(0, -30));
-			if((hit != null) && (hit.collider != null)){
-				if(hit.collider.tag == "Player"){
-					TrollCharge (i);
-				}
-			}
-		}
-
+	void FixedUpdate () {
 		//player movement
 		transform.position = PlayerTransform.transform.position + offset;
 		if (Input.GetKeyDown ("d")) {
