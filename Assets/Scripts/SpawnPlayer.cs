@@ -35,6 +35,7 @@ public class SpawnPlayer : MonoBehaviour {
 		print (random);
 		PlayerTransform = Spawns.transform.GetChild (random);
 		PlayerTransform.name = "Player";
+		PlayerTransform.tag = "Player";
 		PlayerSprite = PlayerTransform.GetComponent<SpriteRenderer>();
 		PlayerTransform.gameObject.AddComponent<Rigidbody2D> ();
 		r = PlayerTransform.gameObject.GetComponent<Rigidbody2D> ();
@@ -65,6 +66,7 @@ public class SpawnPlayer : MonoBehaviour {
 			TrollSprite = Troll.GetComponent<SpriteRenderer> ();
 			TrollSprite.sprite = Tsprite;
 			Trolls [i] = Troll;
+
 		}
 	}
 
@@ -107,8 +109,33 @@ public class SpawnPlayer : MonoBehaviour {
 		}
 	}
 
+	void TrollCharge(int i){
+		print ("Troll Charge!");
+	}
+
 	// Update is called once per frame
 	void Update () {
+		//raycasting
+		RaycastHit2D hit;
+		for(int i = 0; i < 7; i++){
+			//Ray2D TrollSightDown = new Ray2D (Trolls[i].position, Vector2.down);
+			//Ray2D TrollSightLeft = new Ray2D (Trolls [i].position, Vector2.left);
+			//Ray2D TrollSightRight = new Ray2D (Trolls [i].position, Vector2.right);
+			//Ray2D TrollSightUp = new Ray2D (Trolls [i].position, Vector2.up);
+			Debug.DrawRay (Trolls [i].position, new Vector3(0, -30, 0), Color.black, 999.0f, false);
+			Debug.DrawRay (Trolls [i].position, new Vector3(0, 30, 0), Color.black, 999.0f, false);
+			Debug.DrawRay (Trolls [i].position, new Vector3(-30, 0, 0), Color.black, 999.0f);
+			Debug.DrawRay (Trolls [i].position, new Vector3(30, 0, 0), Color.black, 999.0f);
+			//Ray2D[] TrollSights = {TrollSightDown, TrollSightLeft, TrollSightRight, TrollSightUp};
+			hit = Physics2D.Raycast(Trolls[i].position, new Vector2(0, -30));
+			if((hit != null) && (hit.collider != null)){
+				if(hit.collider.tag == "Player"){
+					TrollCharge (i);
+				}
+			}
+		}
+
+		//player movement
 		transform.position = PlayerTransform.transform.position + offset;
 		if (Input.GetKeyDown ("d")) {
 			TrollMove ();
