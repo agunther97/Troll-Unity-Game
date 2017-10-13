@@ -107,11 +107,80 @@ public class SpawnPlayer : MonoBehaviour {
 			if (moverand == 4) {
 				TrollBody.transform.position = new Vector3 (Trolls[i].position.x, Trolls[i].position.y - 4.0f, Trolls[i].position.z);
 			}
-			RaycastHit2D hit = Physics2D.Raycast (new Vector2(Trolls[i].position.x, Trolls[i].position.y - 2.5f), new Vector2(0, -500), 20.0f);
-			Debug.DrawRay (new Vector3(Trolls [i].position.x, Trolls[i].position.y - 2.5f, 0.0f), new Vector3(0, -500, 0), Color.black, 1.0f, false);
-			if (hit) {
-				if(hit.collider.name == "Player"){
+
+			Vector3 RightUpDirection = Quaternion.AngleAxis (20.0f, Vector3.forward) * -Trolls [i].right;
+			Vector3 RightDownDirection = Quaternion.AngleAxis (-20.0f, Vector3.forward) * -Trolls [i].right;
+			Vector3 LeftUpDirection = Quaternion.AngleAxis (20.0f, Vector3.back) * Trolls [i].right;
+			Vector3 LeftDownDirection = Quaternion.AngleAxis (-20.0f, Vector3.back) * Trolls [i].right;
+
+			RaycastHit2D RightUpHit = Physics2D.Raycast (new Vector2(Trolls[i].position.x + 2.5f, Trolls[i].position.y), RightUpDirection, 20.0f);
+			RaycastHit2D RightDownHit = Physics2D.Raycast (new Vector2(Trolls[i].position.x + 2.5f, Trolls[i].position.y), RightDownDirection, 20.0f);
+			RaycastHit2D LeftUpHit = Physics2D.Raycast (new Vector2(Trolls[i].position.x - 2.5f, Trolls[i].position.y), LeftUpDirection, 20.0f);
+			RaycastHit2D LeftDownHit = Physics2D.Raycast (new Vector2(Trolls[i].position.x - 2.5f, Trolls[i].position.y), LeftDownDirection, 20.0f);
+
+			RaycastHit2D DownHit = Physics2D.Raycast (new Vector2(Trolls[i].position.x, Trolls[i].position.y - 2.5f), new Vector2(0, -500), 20.0f);
+			RaycastHit2D UpHit = Physics2D.Raycast (new Vector2(Trolls[i].position.x, Trolls[i].position.y + 2.5f), new Vector2(0, 500), 20.0f);
+			RaycastHit2D LeftHit = Physics2D.Raycast (new Vector2(Trolls[i].position.x - 2.5f, Trolls[i].position.y - 2.5f), new Vector2(-500, 0), 20.0f);
+			RaycastHit2D RightHit = Physics2D.Raycast (new Vector2(Trolls[i].position.x + 2.5f, Trolls[i].position.y), new Vector2(500, 0), 20.0f);
+
+
+//			Debug.DrawRay (new Vector3(Trolls [i].position.x, Trolls[i].position.y - 2.5f, 0.0f), new Vector3(0, -500, 0), Color.black, 1.0f, false);
+//			Debug.DrawRay (new Vector3(Trolls [i].position.x, Trolls[i].position.y + 2.5f, 0.0f), new Vector3(0, 500, 0), Color.black, 1.0f, false);
+//			Debug.DrawRay (new Vector3(Trolls [i].position.x - 2.5f, Trolls[i].position.y, 0.0f), new Vector3(-500, 0, 0), Color.black, 1.0f, false);
+//			Debug.DrawRay (new Vector3(Trolls [i].position.x + 2.5f, Trolls[i].position.y, 0.0f), new Vector3(500, 0, 0), Color.black, 1.0f, false);
+//
+//			Debug.DrawRay (new Vector3(Trolls[i].position.x + 2.5f, Trolls[i].position.y, 0.0f), RightUpDirection*500.0f, Color.black, 1.0f, false);
+//			Debug.DrawRay (new Vector3(Trolls[i].position.x + 2.5f, Trolls[i].position.y, 0.0f), RightDownDirection*500.0f, Color.black, 1.0f, false);
+//			Debug.DrawRay (new Vector3(Trolls[i].position.x - 2.5f, Trolls[i].position.y, 0.0f), LeftUpDirection*500.0f, Color.black, 1.0f, false);
+//			Debug.DrawRay (new Vector3(Trolls[i].position.x - 2.5f, Trolls[i].position.y, 0.0f), LeftDownDirection*500.0f, Color.black, 1.0f, false);
+
+
+			if (DownHit) {
+				if(DownHit.collider.name == "Player"){
 					TrollCharge (i);
+					continue;
+				}
+			}
+			if (UpHit) {
+				if(UpHit.collider.name == "Player"){
+					TrollCharge (i);
+					continue;
+				}
+			}
+			if (LeftHit) {
+				if(LeftHit.collider.name == "Player"){
+					TrollCharge (i);
+					continue;
+				}
+			}
+			if (RightHit) {
+				if(RightHit.collider.name == "Player"){
+					TrollCharge (i);
+					continue;
+				}
+			}
+			if (RightUpHit) {
+				if(RightUpHit.collider.name == "Player"){
+					TrollCharge (i);
+					continue;
+				}
+			}
+			if (RightDownHit) {
+				if(RightDownHit.collider.name == "Player"){
+					TrollCharge (i);
+					continue;
+				}
+			}
+			if (LeftUpHit) {
+				if(LeftUpHit.collider.name == "Player"){
+					TrollCharge (i);
+					continue;
+				}
+			}
+			if (LeftDownHit) {
+				if(LeftDownHit.collider.name == "Player"){
+					TrollCharge (i);
+					continue;
 				}
 			}
 		}
