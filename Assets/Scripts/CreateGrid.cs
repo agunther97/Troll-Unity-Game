@@ -6,6 +6,7 @@ public class CreateGrid : MonoBehaviour
 {
 	List<List<Tile>> map = new List<List<Tile>>();
 	Stack<Tile> visitedTiles = new Stack<Tile>();
+	Tile playerTile;
 	[Tooltip("The number of rows or cols in our maze, must be odd numbers, will scale up if an even # is entered")]
 	public int rows;
 	public int cols;
@@ -19,6 +20,52 @@ public class CreateGrid : MonoBehaviour
 		MazeDriver();
 	}
 
+	public void Update()
+	{
+		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
+			PlayerMovement('e');
+		else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
+			PlayerMovement('w');
+		else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
+			PlayerMovement('s');
+		else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
+			PlayerMovement('n');
+	}
+
+	private void PlayerMovement(char direction)
+	{
+		switch (direction) {
+			case 'n':
+				if (!GetNorthTile(playerTile).isWall) {
+					playerTile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 255);
+					playerTile = GetNorthTile(playerTile);
+				}
+				break;
+			case 's':
+				if (!GetSouthTile(playerTile).isWall) {
+					playerTile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 255);
+					playerTile = GetSouthTile(playerTile);
+				}
+				break;
+			case 'e':
+				if (!GetEastTile(playerTile).isWall) {
+					playerTile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 255);
+					playerTile = GetEastTile(playerTile);
+				}
+				break;
+			case 'w':
+				if(!GetWestTile(playerTile).isWall) {
+					playerTile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 255);
+					playerTile = GetWestTile(playerTile);
+				}
+				break;
+			default:
+				Debug.Log("Error, invalid direction supplied");
+				break;
+		}
+		CalculateVisibility(playerTile);
+	}
+
 	public void MazeDriver()
 	{
 		EnsureOddSize(); // ensure that the grid has an odd number for rows and cols
@@ -26,6 +73,7 @@ public class CreateGrid : MonoBehaviour
 		PopulateMapWithWalls();
 		GenerateMaze();
 		ChangeSprites();
+		CalculateVisibility(playerTile);
 	}
 
 	private void EnsureOddSize()
@@ -45,6 +93,7 @@ public class CreateGrid : MonoBehaviour
 				Tile tile = new Tile(x, y);
 				tile.obj = Instantiate(tileObject, new Vector3(UnityX, UnityY, 0f), Quaternion.identity, container);
 				tile.obj.name = "(" + x + ", " + y + ")";
+				tile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 0);
 				row.Add(tile);
 				UnityX += xPadding;
 			}
@@ -106,6 +155,7 @@ public class CreateGrid : MonoBehaviour
 		} while(randomX % 2 == 0 || randomY % 2 == 0);
 		Debug.Log("Start X: " + randomX + " Start Y: " + randomY);
 		map[randomX][randomY].obj.GetComponent<SpriteRenderer>().color = Color.red; //test code
+		playerTile = map[randomX][randomY];
 		return map[randomX][randomY];
 	}
 
@@ -128,12 +178,10 @@ public class CreateGrid : MonoBehaviour
 				GetNorthTile(northTile).isWall = false;
 				visitedTiles.Push(GetNorthTile(northTile));
 				return GetNorthTile(northTile);
-				break;
 			case 1:
 				startTile.moveSouth = false;
 				Tile southTile = GetSouthTile(startTile);
 				southTile.isWall = false;
-				//southTile.moveSouth = false;
 				GetSouthTile(southTile).isWall = false;
 				visitedTiles.Push(GetSouthTile(southTile));
 				return GetSouthTile(southTile);
@@ -208,5 +256,103 @@ public class CreateGrid : MonoBehaviour
 					tile.obj.GetComponent<SpriteRenderer>().sprite = blankSprite;
 			}
 		}
+	}
+
+	private void CalculateVisibility(Tile origin)
+	{
+		HideAllTiles();
+		List<List<Tile>> visibleTiles = new List<List<Tile>>();
+		origin.obj.GetComponent<SpriteRenderer>().color = new Color32(255, 0, 0, 255);
+		RevealWallsAroundVisibleTile(origin);
+		visibleTiles.Add(GetVisibleNorthTiles(origin));
+		visibleTiles.Add(GetVisibleSouthTiles(origin));
+		visibleTiles.Add(GetVisibleEastTiles(origin));
+		visibleTiles.Add(GetVisibleWestTiles(origin));
+		foreach (List<Tile> direction in visibleTiles) {
+			foreach (Tile tile in direction) {
+				tile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 255);
+				RevealWallsAroundVisibleTile(tile);
+			}
+		}
+	}
+
+	private void HideAllTiles()
+	{
+		foreach (List<Tile> row in map) {
+			foreach (Tile tile in row) {
+				tile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 0);
+			}
+		}
+	}
+
+	private List<Tile> GetVisibleNorthTiles(Tile current)
+	{
+		List<Tile> visibleTiles = new List<Tile>();
+		while (true) {
+			current = GetNorthTile(current);
+			if (current.isWall) {
+				return visibleTiles;
+			} else {
+				visibleTiles.Add(current);
+			}
+		}
+	}
+
+	private List<Tile> GetVisibleSouthTiles(Tile current)
+	{
+		List<Tile> visibleTiles = new List<Tile>();
+		while (true) {
+			current = GetSouthTile(current);
+			if (current.isWall) {
+				return visibleTiles;
+			} else {
+				visibleTiles.Add(current);
+			}
+		}
+	}
+
+	private List<Tile> GetVisibleEastTiles(Tile current)
+	{
+		List<Tile> visibleTiles = new List<Tile>();
+		while (true) {
+			current = GetEastTile(current);
+			if (current.isWall) {
+				return visibleTiles;
+			} else {
+				visibleTiles.Add(current);
+			}
+		}
+	}
+
+	private List<Tile> GetVisibleWestTiles(Tile current)
+	{
+		List<Tile> visibleTiles = new List<Tile>();
+		while (true) {
+			current = GetWestTile(current);
+			if (current.isWall) {
+				return visibleTiles;
+			} else {
+				visibleTiles.Add(current);
+			}
+		}
+	}
+
+	private void RevealWallsAroundVisibleTile(Tile tile)
+	{
+		List<Tile> neighbours = GetTileNeighbours(tile);
+		foreach (Tile neigh in neighbours) {
+			if(neigh.isWall)
+				neigh.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 255);
+		}
+	}
+
+	private List<Tile> GetTileNeighbours(Tile tile)
+	{
+		List<Tile> neighbours = new List<Tile>();
+		neighbours.Add(GetNorthTile(tile));
+		neighbours.Add(GetSouthTile(tile));
+		neighbours.Add(GetEastTile(tile));
+		neighbours.Add(GetWestTile(tile));
+		return neighbours;
 	}
 }
