@@ -8,8 +8,15 @@ public class Tile
 	public int y { get; set; }
 	public bool isOccupied { get; set; }
 	public bool isWall{ get; set; }
-	public bool moveNorth { get; set; } = true;
-	public bool moveSouth { get; set; } = true;
-	public bool moveEast { get; set; } = true;
-	public bool moveWest { get; set; } = true;
+	public bool moveNorth { get; set; }
+	public bool moveSouth { get; set; }
+	public bool moveEast { get; set; }
+	public bool moveWest { get; set; }
+	public GameObject obj { get; set;}
+
+	public Tile(int p_x, int p_y)
+	{
+		x = p_x;
+		y = p_y;
+	}
 }

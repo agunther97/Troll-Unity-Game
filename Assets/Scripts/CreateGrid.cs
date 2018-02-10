@@ -9,23 +9,23 @@ public class CreateGrid : MonoBehaviour
 	[Tooltip("The number of rows or cols in our maze, must be odd numbers, will scale up if an even # is entered")]
 	public int rows;
 	public int cols;
+	public GameObject tileObject;
+	public Transform container;
+	public Sprite blankSprite;
 	//the rows and cols of our grid
 
-	struct Point {
-		public int x { get; set;}
-		public int y { get; set; }
-		public Point(int p_x, int p_y)
-		{
-			x = p_x;
-			y = p_y;
-		}
+	public void Awake()
+	{
+		MazeDriver();
 	}
 
 	public void MazeDriver()
 	{
 		EnsureOddSize(); // ensure that the grid has an odd number for rows and cols
+		FillMap();
 		PopulateMapWithWalls();
 		GenerateMaze();
+		ChangeSprites();
 	}
 
 	private void EnsureOddSize()
@@ -36,38 +36,76 @@ public class CreateGrid : MonoBehaviour
 			cols++;
 	}
 
+	private void FillMap()
+	{
+		float xPadding = 0.61f, yPadding = 0.61f, UnityX = 0.0f, UnityY = 0.0f;
+		for (int x = 0; x < rows; x++) {
+			List<Tile> row = new List<Tile>();
+			for (int y = 0; y < cols; y++) {
+				Tile tile = new Tile(x, y);
+				tile.obj = Instantiate(tileObject, new Vector3(UnityX, UnityY, 0f), Quaternion.identity, container);
+				tile.obj.name = "(" + x + ", " + y + ")";
+				row.Add(tile);
+				UnityX += xPadding;
+			}
+			map.Add(row);
+			UnityY += yPadding;
+			UnityX = 0.0f;
+		}
+	}
+
 	private void PopulateMapWithWalls()
 	{
-		foreach (Tile tile in map) {
-			tile.isWall = true;
-			if (tile.x == 0 || tile.x == 1 )
-				tile.moveWest = false;
-			if (tile.x == rows - 1 || tile.x == rows - 2)
-				tile.moveEast = false;
-			if (tile.y == 0 || tile.y == 1)
-				tile.moveSouth = false;
-			if (tile.y == cols - 1 || tile.y == cols - 2)
-				tile.moveNorth = false;
+		foreach (List<Tile> row in map) {
+			foreach (Tile tile in row) {
+				tile.isWall = true;
+				if (tile.x <= 2) {
+					tile.moveWest = false;
+				} else {
+					tile.moveWest = true;
+				}
+				if (tile.x >= rows - 3) {
+					tile.moveEast = false;
+				} else {
+					tile.moveEast = true;
+				}
+				if (tile.y <= 2) {
+					tile.moveSouth = false; 
+				} else {
+					tile.moveSouth = true;
+				}
+				if (tile.y >= cols - 3) {
+					tile.moveNorth = false;
+				} else {
+					tile.moveNorth = true;
+				}
+			}
 		}
 	}
 
 	private void GenerateMaze()
 	{
-		Tile startTile = GrabRandomTile();
+		Tile startTile = GrabRandomStartTile();
+		startTile.isWall = false;
 		visitedTiles.Push(startTile); // put our first tile on the stack
 		bool running = true;
 		while (running) {
 			startTile = GetRandomPath(startTile);
 			if (startTile == null) {
-				return;
+				break;
 			}
 		}
 	}
-
-	private Tile GrabRandomTile()
+		
+	private Tile GrabRandomStartTile()
 	{
-		int randomX = Random.Range(0, rows-1);
-		int randomY = Random.Range(0, cols-1);
+		int randomX, randomY;
+		do {
+			randomX = Random.Range(1, cols - 1);
+			randomY = Random.Range(1, rows - 1);
+		} while(randomX % 2 == 0 || randomY % 2 == 0);
+		Debug.Log("Start X: " + randomX + " Start Y: " + randomY);
+		map[randomX][randomY].obj.GetComponent<SpriteRenderer>().color = Color.red; //test code
 		return map[randomX][randomY];
 	}
 
@@ -75,64 +113,100 @@ public class CreateGrid : MonoBehaviour
 	{
 		List<int> validDirections = GetValidDirections(startTile);
 		if (validDirections.Count == 0) {
-			if (visitedTiles.Count == 0)
+			if (visitedTiles.Count == 1)
 				return null;
 			visitedTiles.Pop();
 			return visitedTiles.Peek();
 		}
-		int randomDirectionIndex = Random.Range(0, validDirections - 1);
+		int randomDirectionIndex = Random.Range(0, validDirections.Count);
 		int direction = validDirections[randomDirectionIndex];
 		switch (direction) {
 			case 0:
 				startTile.moveNorth = false;
-				Tile northTile = map.GetNorthTile(startTile);
+				Tile northTile = GetNorthTile(startTile);
 				northTile.isWall = false;
-				northTile.moveNorth = false;
-				map.GetNorthTile(northTile).isWall = false;
-				visitedTiles.Push(map.GetNorthTile(northTile));
-				return map.GetNorthTile(northTile);
+				GetNorthTile(northTile).isWall = false;
+				visitedTiles.Push(GetNorthTile(northTile));
+				return GetNorthTile(northTile);
 				break;
 			case 1:
 				startTile.moveSouth = false;
-				Tile southTile = map.GetSouthTile(startTile);
+				Tile southTile = GetSouthTile(startTile);
 				southTile.isWall = false;
-				southTile.moveSouth = false;
-				map.GetSouthTile(southTile).isWall = false;
-				visitedTiles.Push(map.GetSouthTile(southTile));
-				return map.GetSouthTile(southTile);
-				break;
+				//southTile.moveSouth = false;
+				GetSouthTile(southTile).isWall = false;
+				visitedTiles.Push(GetSouthTile(southTile));
+				return GetSouthTile(southTile);
 			case 2:
 				startTile.moveEast = false;
-				Tile eastTile = map.GetEastTile(startTile);
+				Tile eastTile = GetEastTile(startTile);
 				eastTile.isWall = false;
-				eastTile.moveEast = false;
-				map.GetEastTile(eastTile).isWall = false;
-				visitedTiles.Push(map.GetEastTile(eastTile));
-				return map.GetEastTile(eastTile);
-				break;
+				GetEastTile(eastTile).isWall = false;
+				visitedTiles.Push(GetEastTile(eastTile));
+				return GetEastTile(eastTile);
 			case 3:
 				startTile.moveWest = false;
-				Tile westTile = map.GetWestTile(startTile);
+				Tile westTile = GetWestTile(startTile);
 				westTile.isWall = false;
-				westTile.moveWest = false;
-				map.GetWestTile(westTile).isWall = false;
-				visitedTiles.Push(map.GetWestTile(westTile));
-				return map.GetWestTile(westTile);
-				break;
+				GetWestTile(westTile).isWall = false;
+				visitedTiles.Push(GetWestTile(westTile));
+				return GetWestTile(westTile);
+			default:
+				return null;
 		}
+	}
+
+	private Tile GetNorthTile(Tile origin)
+	{
+		return map[origin.x][origin.y + 1];
+	}
+
+	private Tile GetSouthTile(Tile origin)
+	{
+		return map[origin.x][origin.y - 1];
+	}
+
+	private Tile GetEastTile(Tile origin)
+	{
+		return map[origin.x + 1][origin.y];
+	}
+
+	private Tile GetWestTile(Tile origin)
+	{
+		return map[origin.x - 1][origin.y];
 	}
 
 	private List<int> GetValidDirections(Tile startTile)
 	{
 		List<int> directions = new List<int>();
-		if (startTile.moveNorth)
-			directions.Add(0);
-		if (startTile.moveSouth)
-			directions.Add(1);
-		if (startTile.moveEast)
-			directions.Add(2);
-		if (startTile.moveWest)
-			directions.Add(3);
+		if (startTile.moveNorth) {
+			if(GetNorthTile(startTile).isWall && GetNorthTile(GetNorthTile(startTile)).isWall)
+				directions.Add(0);
+		}
+		if (startTile.moveSouth) {
+			if(GetSouthTile(startTile).isWall && GetSouthTile(GetSouthTile(startTile)).isWall)
+				directions.Add(1);
+		}
+		if (startTile.moveEast) {
+			if(GetEastTile(startTile).isWall && GetEastTile(GetEastTile(startTile)).isWall)
+				directions.Add(2);
+		}
+		if (startTile.moveWest) {
+			if(GetWestTile(startTile).isWall && GetWestTile(GetWestTile(startTile)).isWall)
+				directions.Add(3);
+		}
 		return directions;
+	}
+
+	private void ChangeSprites()
+	{
+		foreach (List<Tile> row in map) {
+			foreach (Tile tile in row) {
+				if (tile.obj == null)
+					Debug.Log("Tile has no object");
+				if(!tile.isWall)
+					tile.obj.GetComponent<SpriteRenderer>().sprite = blankSprite;
+			}
+		}
 	}
 }
