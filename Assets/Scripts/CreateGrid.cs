@@ -74,6 +74,7 @@ public class CreateGrid : MonoBehaviour
 		GenerateMaze();
 		ChangeSprites();
 		CalculateVisibility(playerTile);
+		SpawnTrolls();
 	}
 
 	private void EnsureOddSize()
@@ -263,15 +264,22 @@ public class CreateGrid : MonoBehaviour
 		HideAllTiles();
 		List<List<Tile>> visibleTiles = new List<List<Tile>>();
 		origin.obj.GetComponent<SpriteRenderer>().color = new Color32(255, 0, 0, 255);
-		RevealWallsAroundVisibleTile(origin);
+		origin.isVisited = true;
+		RevealCardinalWallsAroundVisibleTile(origin);
 		visibleTiles.Add(GetVisibleNorthTiles(origin));
 		visibleTiles.Add(GetVisibleSouthTiles(origin));
 		visibleTiles.Add(GetVisibleEastTiles(origin));
 		visibleTiles.Add(GetVisibleWestTiles(origin));
 		foreach (List<Tile> direction in visibleTiles) {
 			foreach (Tile tile in direction) {
-				tile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 255);
-				RevealWallsAroundVisibleTile(tile);
+				Reveal(tile);
+				RevealCardinalWallsAroundVisibleTile(tile);
+			}
+		}
+		foreach (List<Tile> direction in visibleTiles) {
+			if (direction.Count != 0) {
+				Tile rowEndTile = direction[direction.Count - 1];
+				RevealAllSurroundingWallTiles(rowEndTile);
 			}
 		}
 	}
@@ -280,7 +288,8 @@ public class CreateGrid : MonoBehaviour
 	{
 		foreach (List<Tile> row in map) {
 			foreach (Tile tile in row) {
-				tile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 0);
+				if(!tile.isVisited)
+					tile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 0);
 			}
 		}
 	}
@@ -337,12 +346,13 @@ public class CreateGrid : MonoBehaviour
 		}
 	}
 
-	private void RevealWallsAroundVisibleTile(Tile tile)
+	private void RevealCardinalWallsAroundVisibleTile(Tile tile)
 	{
 		List<Tile> neighbours = GetTileNeighbours(tile);
 		foreach (Tile neigh in neighbours) {
-			if(neigh.isWall)
-				neigh.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 255);
+			if (neigh.isWall) {
+				Reveal(neigh);
+			}
 		}
 	}
 
@@ -354,5 +364,27 @@ public class CreateGrid : MonoBehaviour
 		neighbours.Add(GetEastTile(tile));
 		neighbours.Add(GetWestTile(tile));
 		return neighbours;
+	}
+
+	private void RevealAllSurroundingWallTiles(Tile tile)
+	{
+		Reveal(map[tile.x - 1][tile.y + 1]);
+		Reveal(map[tile.x + 1][tile.y + 1]);
+		Reveal(map[tile.x - 1][tile.y - 1]);
+		Reveal(map[tile.x + 1][tile.y - 1]);
+
+	}
+
+	private void Reveal(Tile tile)
+	{
+		tile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 255);
+		tile.isVisited = true;
+	}
+
+	private void SpawnTrolls()
+	{
+		int totalTiles = rows * cols;
+		int numberOfTrolls = totalTiles / 100;
+		Debug.Log("Spawning " + numberOfTrolls + " trolls");
 	}
 }

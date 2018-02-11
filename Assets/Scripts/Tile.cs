@@ -7,7 +7,8 @@ public class Tile
 	public int x { get; set; }
 	public int y { get; set; }
 	public bool isOccupied { get; set; }
-	public bool isWall{ get; set; }
+	public bool isWall { get; set; }
+	public bool isVisited { get; set; }
 	public bool moveNorth { get; set; }
 	public bool moveSouth { get; set; }
 	public bool moveEast { get; set; }
