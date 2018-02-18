@@ -6,7 +6,10 @@ public class PlayerController : MonoBehaviour {
 	private Tile playerTile;
 	private Grid grid;
 	private Vision vision;
+	private char movementDirection = 'x';
+	public Camera playerCam;
 	public Sprite playerSprite;
+	bool moveNorth = false, moveEast = false, moveWest = false, moveSouth = false;
 
 	public void StartUp(Tile p_playerTile, Grid p_grid)
 	{
@@ -14,98 +17,99 @@ public class PlayerController : MonoBehaviour {
 		grid = p_grid;
 		playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerSprite;
 		vision = new Vision(grid, playerTile.obj.GetComponent<SpriteRenderer>().sprite);
-		PlayerSetup();
+		playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
+		vision.CalculatePlayerVisibility(playerTile);
 	}
 
-	private void PlayerSetup()
-	{
-		vision.CalculateVisibility(playerTile);
-		List<Tile> playerNeigh = grid.GetTileNeighbours(playerTile);
-		Tile behind;
-		foreach (Tile tile in playerNeigh) {
-			if (!tile.isWall) {
-				if (grid.GetNorthTile(playerTile) == tile) {
-					behind = grid.GetSouthTile(playerTile);
-					vision.Reveal(grid.GetWestTile(behind));
-					vision.Reveal(grid.GetEastTile(behind));
-					break;
-				} else if (grid.GetSouthTile(playerTile) == tile) {
-					playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 180.0f);
-					behind = grid.GetNorthTile(playerTile);
-					vision.Reveal(grid.GetWestTile(behind));
-					vision.Reveal(grid.GetEastTile(behind));
-					break;
-				} else if (grid.GetEastTile(playerTile) == tile) {
-					playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 90.0f);
-					behind = grid.GetWestTile(playerTile);
-					vision.Reveal(grid.GetNorthTile(behind));
-					vision.Reveal(grid.GetSouthTile(behind));
-					break;
-				} else if (grid.GetWestTile(playerTile) == tile) {
-					playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, -90.0f);
-					behind = grid.GetEastTile(playerTile);
-					vision.Reveal(grid.GetNorthTile(behind));
-					vision.Reveal(grid.GetSouthTile(behind));
-					break;
-				}
-			}
-		}
-
-	}
-
-
-	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
-			PlayerMovement('e');
+			moveEast = true;
 		else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
-			PlayerMovement('w');
+			moveWest = true;
 		else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
-			PlayerMovement('s');
+			moveSouth = true;
 		else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-			PlayerMovement('n');	
+			moveNorth = true;
 	}
 
-	private void PlayerMovement(char direction)
+	void FixedUpdate() {
+		if (moveNorth) {
+			if (PlayerMovement('n')) {
+				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
+			}
+			moveNorth = false;
+		} else if (moveEast) {
+			if (PlayerMovement('e')) {
+				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
+			}
+			moveEast = false;
+		} else if (moveWest) {
+			if (PlayerMovement('w')) {
+				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
+			}
+			moveWest = false;
+		} else if (moveSouth) {
+			if (PlayerMovement('s')) {
+				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
+			}
+			moveSouth = false;
+		}
+	}
+
+	private bool PlayerMovement(char direction)
 	{
+		bool pass = false;
 		switch (direction) {
 			case 'n':
 				if (!grid.GetNorthTile(playerTile).isWall) {
 					playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
-					playerTile.obj.GetComponent<SpriteRenderer>().sprite = null;
+					pass = true;
+					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerTile.originalSprite;
 					playerTile = grid.GetNorthTile(playerTile);
-					playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 0.0f);
+					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerSprite;
 				}
+				playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
+				playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 0.0f);
 				break;
 			case 's':
 				if (!grid.GetSouthTile(playerTile).isWall) {
 					playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
-					playerTile.obj.GetComponent<SpriteRenderer>().sprite = null;
+					pass = true;
+					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerTile.originalSprite;
 					playerTile = grid.GetSouthTile(playerTile);
-					playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 180.0f);
+					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerSprite;
 				}
+				playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
+				playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 180.0f);
 				break;
 			case 'e':
 				if (!grid.GetEastTile(playerTile).isWall) {
 					playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
-					playerTile.obj.GetComponent<SpriteRenderer>().sprite = null;
+					pass = true;
+					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerTile.originalSprite;
 					playerTile = grid.GetEastTile(playerTile);
-					playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 90.0f);
+					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerSprite;
 				}
+				playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
+				playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 90.0f);
 				break;
 			case 'w':
 				if(!grid.GetWestTile(playerTile).isWall) {
 					playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
-					playerTile.obj.GetComponent<SpriteRenderer>().sprite = null;
+					pass = true;
+					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerTile.originalSprite;
 					playerTile = grid.GetWestTile(playerTile);
-					playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, -90.0f);
+					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerSprite;
 				}
+				playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
+				playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, -90.0f);
 				break;
 			default:
 				Debug.Log("Error, invalid direction supplied");
 				break;
 		}
-		vision.CalculateVisibility(playerTile);
+		vision.CalculatePlayerVisibility(playerTile);
+		return pass;
 	}
 }
 

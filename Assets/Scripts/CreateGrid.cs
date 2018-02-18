@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CreateGrid : MonoBehaviour 
 {
-	Grid grid = new Grid();
+	Grid grid;
 	List<List<Tile>> map;
 	Stack<Tile> visitedTiles = new Stack<Tile>();
 	Tile playerTile;
@@ -14,10 +14,13 @@ public class CreateGrid : MonoBehaviour
 	public GameObject tileObject;
 	public Transform container;
 	public GameObject playerController;
+	public Sprite wallSprite;
+	public Sprite floorSprite;
 	//the rows and cols of our grid
 
 	public void Awake()
 	{
+		grid = new Grid(rows, cols);
 		map = grid.GetMap();
 		MazeDriver();
 		playerController.GetComponent<PlayerController>().StartUp(playerTile, grid);
@@ -187,10 +190,16 @@ public class CreateGrid : MonoBehaviour
 	{
 		foreach (List<Tile> row in map) {
 			foreach (Tile tile in row) {
-				if (tile.obj == null)
-					Debug.Log("Tile has no object");
-				if(!tile.isWall)
-					tile.obj.GetComponent<SpriteRenderer>().sprite = null;
+				if (!tile.isWall) {
+					tile.obj.GetComponent<SpriteRenderer>().sprite = floorSprite;
+					tile.obj.GetComponent<SpriteRenderer>().color = new Color32(86, 86, 86, 255);
+					tile.originalColor = new Color32(86, 86, 86, 255);
+				} else {
+					tile.obj.GetComponent<SpriteRenderer>().sprite = wallSprite;
+					tile.obj.GetComponent<SpriteRenderer>().color = new Color32(144, 144, 144, 255);
+					tile.originalColor = new Color32(144, 144, 144, 255);
+				}
+				tile.originalSprite = tile.obj.GetComponent<SpriteRenderer>().sprite;
 			}
 		}
 	}

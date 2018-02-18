@@ -3,8 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Grid {
-	List<List<Tile>> map = new List<List<Tile>>();
+	private List<List<Tile>> map = new List<List<Tile>>();
+	private int rows;
+	private int cols;
 
+	public Grid(int p_rows, int p_cols)
+	{
+		rows = p_rows;
+		cols = p_cols;
+	}
+
+	public int GetRows()
+	{
+		return rows;
+	}
+
+	public int GetCols()
+	{
+		return cols;
+	}
 	public List<List<Tile>> GetMap()
 	{
 		return map;

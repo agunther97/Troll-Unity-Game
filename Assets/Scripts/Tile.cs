@@ -6,6 +6,8 @@ public class Tile
 {
 	public int x { get; set; }
 	public int y { get; set; }
+	public Color originalColor { get; set; }
+	public Sprite originalSprite { get; set; }
 	public bool isOccupied { get; set; }
 	public bool isWall { get; set; }
 	public bool isVisited { get; set; }

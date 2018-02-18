@@ -38,12 +38,121 @@ public class Vision {
 		}
 	}
 
+	public void CalculatePlayerVisibility(Tile origin)
+	{
+		HideAllTiles();
+		//Tile edgeTopRow1 = null, edgeTopRow2 = null, edgeBotRow1 = null, edgeBotRow2 = null;
+		List<Tile> rowStartPoints = new List<Tile>();
+		rowStartPoints = GetEastWestValidTilesInRange(3, origin);
+		rowStartPoints.Add(origin);
+		foreach (Tile rowStartPoint in rowStartPoints) {
+			Reveal(rowStartPoint);
+			List<Tile> validRowTiles = GetNorthSouthValidTilesInRange(5, rowStartPoint);
+			foreach (Tile validRowTile in validRowTiles) {
+				Reveal(validRowTile);
+			}
+		}
+		if (origin.x + 4 < grid.GetRows()) {
+			Tile edge = origin;
+			for (int i = 0; i < 4; i++) {
+				edge = grid.GetEastTile(edge);
+			}
+			Reveal(edge);
+			List<Tile> validRowTiles = GetNorthSouthValidTilesInRange(4, edge);
+			foreach (Tile validRowTile in validRowTiles) {
+				Reveal(validRowTile);
+			}
+		}
+		if (origin.x + 5 < grid.GetRows()) {
+			Tile edge = origin;
+			for (int i = 0; i < 5; i++) {
+				edge = grid.GetEastTile(edge);
+			}
+			Reveal(edge);
+			List<Tile> validRowTiles = GetNorthSouthValidTilesInRange(3, edge);
+			foreach (Tile validRowTile in validRowTiles) {
+				Reveal(validRowTile);
+			}
+		}
+		if (origin.x - 4 >= 0) {
+			Tile edge = origin;
+			for (int i = 0; i < 4; i++) {
+				edge = grid.GetWestTile(edge);
+			}
+			Reveal(edge);
+			List<Tile> validRowTiles = GetNorthSouthValidTilesInRange(4, edge);
+			foreach (Tile validRowTile in validRowTiles) {
+				Reveal(validRowTile);
+			}
+		}
+		if (origin.x - 5 >= 0) {
+			Tile edge = origin;
+			for (int i = 0; i < 5; i++) {
+				edge = grid.GetWestTile(edge);
+			}
+			Reveal(edge);
+			List<Tile> validRowTiles = GetNorthSouthValidTilesInRange(3, edge);
+			foreach (Tile validRowTile in validRowTiles) {
+				Reveal(validRowTile);
+			}
+		}
+		origin.obj.GetComponent<SpriteRenderer>().color = Color.yellow;
+	}
+
+	private List<Tile> GetNorthSouthValidTilesInRange(int range, Tile origin)
+	{
+		List<Tile> rowStartPoints = new List<Tile>();
+		Tile current = origin;
+		for (int i = 0; i < range; i++) {
+			if (current.y + 1 < grid.GetCols()) {
+				current = grid.GetNorthTile(current);
+				rowStartPoints.Add(current);
+			} else {
+				break;
+			}
+		}
+		current = origin;
+		for (int i = 0; i < range; i++) {
+			if (current.y - 1 >= 0) {
+				current = grid.GetSouthTile(current);
+				rowStartPoints.Add(current);
+			} else {
+				break;
+			}
+		}
+		return rowStartPoints;
+	}
+
+	private List<Tile> GetEastWestValidTilesInRange(int range, Tile origin)
+	{
+		List<Tile> validRowTiles = new List<Tile>();
+		Tile current = origin;
+		for (int i = 0; i < range; i++) {
+			if (current.x + 1 < grid.GetRows()) {
+				current = grid.GetEastTile(current);
+				validRowTiles.Add(current);
+			} else {
+				break;
+			}
+		}
+		current = origin;
+		for (int i = 0; i < range; i++) {
+			if (current.x - 1 >= 0) {
+				current = grid.GetWestTile(current);
+				validRowTiles.Add(current);
+			} else {
+				break;
+			}
+		}
+		return validRowTiles;
+	}
+
 	private void HideAllTiles()
 	{
 		foreach (List<Tile> row in grid.GetMap()) {
 			foreach (Tile tile in row) {
-				if(!tile.isVisited)
-					tile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 0);
+				//if(!tile.isVisited)
+					tile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 255);
 			}
 		}
 	}
@@ -121,7 +230,7 @@ public class Vision {
 
 	public void Reveal(Tile tile)
 	{
-		tile.obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 255);
+		tile.obj.GetComponent<SpriteRenderer>().color = tile.originalColor;
 		tile.isVisited = true;
 	}
 }
