@@ -68,6 +68,10 @@ public class CreateGrid : MonoBehaviour
 		foreach (List<Tile> row in map) {
 			foreach (Tile tile in row) {
 				tile.isWall = true;
+				if (tile.x == 0 || tile.x == rows - 1|| tile.y == 0 || tile.y == cols - 1)
+					tile.isEdge = true;
+				else
+					tile.isEdge = false;
 				if (tile.x <= 2) {
 					tile.moveWest = false;
 				} else {

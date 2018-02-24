@@ -108,11 +108,13 @@ public class PlayerController : MonoBehaviour {
 			playerTile = PlayerMovement(playerTile, grid.GetNorthTile(playerTile));	
 		} else {
 			if (pushedNorthBefore) {
-				possiblePushRecieveTile = grid.GetNorthTile(grid.GetNorthTile(playerTile)); 
-				if (!possiblePushRecieveTile.isWall) {
-					pass = true;
-					PushWall(possiblePushRecieveTile, grid.GetNorthTile(playerTile));
-					playerTile = PlayerMovement(playerTile, grid.GetNorthTile(playerTile));
+				if (!grid.GetNorthTile(playerTile).isEdge) {
+					possiblePushRecieveTile = grid.GetNorthTile(grid.GetNorthTile(playerTile)); 
+					if (!possiblePushRecieveTile.isWall) {
+						pass = true;
+						PushWall(possiblePushRecieveTile, grid.GetNorthTile(playerTile));
+						playerTile = PlayerMovement(playerTile, grid.GetNorthTile(playerTile));
+					}
 				}
 			} else {
 				pushedNorthBefore = true;
@@ -137,11 +139,13 @@ public class PlayerController : MonoBehaviour {
 			playerTile = PlayerMovement(playerTile, grid.GetSouthTile(playerTile));
 		} else {
 			if (pushedSouthBefore) {
-				possiblePushRecieveTile = grid.GetSouthTile(grid.GetSouthTile(playerTile));
-				if (!possiblePushRecieveTile.isWall) {
-					pass = true;
-					PushWall(possiblePushRecieveTile, grid.GetSouthTile(playerTile));
-					playerTile = PlayerMovement(playerTile, grid.GetSouthTile(playerTile));
+				if (!grid.GetSouthTile(playerTile).isEdge) {
+					possiblePushRecieveTile = grid.GetSouthTile(grid.GetSouthTile(playerTile));
+					if (!possiblePushRecieveTile.isWall) {
+						pass = true;
+						PushWall(possiblePushRecieveTile, grid.GetSouthTile(playerTile));
+						playerTile = PlayerMovement(playerTile, grid.GetSouthTile(playerTile));
+					}
 				}
 			} else {
 				pushedSouthBefore = true;
@@ -166,11 +170,13 @@ public class PlayerController : MonoBehaviour {
 			playerTile = PlayerMovement(playerTile, grid.GetEastTile(playerTile));
 		} else {
 			if (pushedEastBefore) {
-				possiblePushRecieveTile = grid.GetEastTile(grid.GetEastTile(playerTile));
-				if (!possiblePushRecieveTile.isWall) {
-					pass = true;
-					PushWall(possiblePushRecieveTile, grid.GetEastTile(playerTile));
-					playerTile = PlayerMovement(playerTile, grid.GetEastTile(playerTile));
+				if (!grid.GetEastTile(playerTile).isEdge) {
+					possiblePushRecieveTile = grid.GetEastTile(grid.GetEastTile(playerTile));
+					if (!possiblePushRecieveTile.isWall) {
+						pass = true;
+						PushWall(possiblePushRecieveTile, grid.GetEastTile(playerTile));
+						playerTile = PlayerMovement(playerTile, grid.GetEastTile(playerTile));
+					}
 				}
 			} else {
 				pushedEastBefore = true;
@@ -195,11 +201,13 @@ public class PlayerController : MonoBehaviour {
 			playerTile = PlayerMovement(playerTile, grid.GetWestTile(playerTile));
 		} else {
 			if (pushedWestBefore) {
-				possiblePushRecieveTile = grid.GetWestTile(grid.GetWestTile(playerTile));
-				if (!possiblePushRecieveTile.isWall) {
-					pass = true;
-					PushWall(possiblePushRecieveTile, grid.GetWestTile(playerTile));
-					playerTile = PlayerMovement(playerTile, grid.GetWestTile(playerTile));
+				if (!grid.GetWestTile(playerTile).isEdge) {
+					possiblePushRecieveTile = grid.GetWestTile(grid.GetWestTile(playerTile));
+					if (!possiblePushRecieveTile.isWall) {
+						pass = true;
+						PushWall(possiblePushRecieveTile, grid.GetWestTile(playerTile));
+						playerTile = PlayerMovement(playerTile, grid.GetWestTile(playerTile));
+					}
 				}
 			} else {
 				pushedWestBefore = true;

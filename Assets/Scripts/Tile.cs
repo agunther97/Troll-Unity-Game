@@ -15,6 +15,7 @@ public class Tile
 	public bool moveSouth { get; set; }
 	public bool moveEast { get; set; }
 	public bool moveWest { get; set; }
+	public bool isEdge { get; set; }
 	public GameObject obj { get; set;}
 
 	public Tile(int p_x, int p_y)
