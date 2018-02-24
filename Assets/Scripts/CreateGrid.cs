@@ -16,6 +16,7 @@ public class CreateGrid : MonoBehaviour
 	public GameObject playerController;
 	public Sprite wallSprite;
 	public Sprite floorSprite;
+	public Sprite lazerSprite;
 	//the rows and cols of our grid
 
 	public void Awake()
@@ -33,6 +34,7 @@ public class CreateGrid : MonoBehaviour
 		PopulateMapWithWalls();
 		GenerateMaze();
 		ChangeSprites();
+		SpawnLazers();
 		SpawnTrolls();
 	}
 
@@ -117,9 +119,18 @@ public class CreateGrid : MonoBehaviour
 			randomX = Random.Range(1, cols - 1);
 			randomY = Random.Range(1, rows - 1);
 		} while(randomX % 2 == 0 || randomY % 2 == 0);
-		Debug.Log("Start X: " + randomX + " Start Y: " + randomY);
 		map[randomX][randomY].obj.GetComponent<SpriteRenderer>().color = new Color32(0, 0, 0, 255);
 		playerTile = map[randomX][randomY];
+		return map[randomX][randomY];
+	}
+
+	private Tile GetRandomTile()
+	{
+		int randomX, randomY;
+		do {
+			randomX = Random.Range(1, cols - 1);
+			randomY = Random.Range(1, rows - 1);
+		} while(randomX % 2 == 0 || randomY % 2 == 0);
 		return map[randomX][randomY];
 	}
 
@@ -208,6 +219,26 @@ public class CreateGrid : MonoBehaviour
 		}
 	}
 		
+	private void SpawnLazers()
+	{
+		int totalTiles = rows * cols;
+		int numberOfLasers = totalTiles / 100;
+		numberOfLasers -= 5;
+		if (numberOfLasers < 0)
+			numberOfLasers = 1;
+		for (int i = 0; i < numberOfLasers; i++) {
+			Tile randomTile = GetRandomTile();
+			while (randomTile.isWall) {
+				randomTile = GetRandomTile();
+			}
+			randomTile.obj.GetComponent<SpriteRenderer>().sprite = lazerSprite;
+			randomTile.obj.GetComponent<SpriteRenderer>().color = Color.blue;
+			randomTile.originalSprite = lazerSprite;
+			randomTile.originalColor = Color.blue;
+			randomTile.isLazer = true;
+		}
+	}
+
 	private void SpawnTrolls()
 	{
 		int totalTiles = rows * cols;

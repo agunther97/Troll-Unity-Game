@@ -90,7 +90,12 @@ public class PlayerController : MonoBehaviour {
 				Debug.Log("Error, invalid direction supplied");
 				break;
 		}
-		vision.CalculatePlayerVisibility(playerTile);
+		if (pass) {
+			vision.CalculatePlayerVisibility(playerTile);
+			if (playerTile.isLazer) {
+				grid.CollectLazer(playerTile);
+			}
+		}
 		return pass;
 	}
 

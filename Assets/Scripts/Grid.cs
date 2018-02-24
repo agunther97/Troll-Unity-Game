@@ -82,4 +82,11 @@ public class Grid {
 		tile.originalColor = floorColor;
 		tile.originalSprite = floorSprite;
 	}
+
+	public void CollectLazer(Tile tile)
+	{
+		tile.isLazer = false;
+		tile.originalColor = floorColor;
+		tile.originalSprite = floorSprite;
+	}
 }
