@@ -6,11 +6,19 @@ public class Grid {
 	private List<List<Tile>> map = new List<List<Tile>>();
 	private int rows;
 	private int cols;
+	private Sprite floorSprite;
+	private Sprite wallSprite;
+	private Color floorColor;
+	private Color wallColor;
 
-	public Grid(int p_rows, int p_cols)
+	public Grid(int p_rows, int p_cols, Sprite p_floorSprite, Color p_floorColor, Sprite p_wallSprite, Color p_wallColor)
 	{
 		rows = p_rows;
 		cols = p_cols;
+		floorSprite = p_floorSprite;
+		wallSprite = p_wallSprite;
+		wallColor = p_wallColor;
+		floorColor = p_floorColor;
 	}
 
 	public int GetRows()
@@ -55,5 +63,23 @@ public class Grid {
 		neighbours.Add(GetEastTile(tile));
 		neighbours.Add(GetWestTile(tile));
 		return neighbours;
+	}
+
+	public void ChangeToWall(Tile tile)
+	{
+		tile.obj.GetComponent<SpriteRenderer>().sprite = wallSprite;
+		tile.isWall = true;
+		tile.obj.GetComponent<SpriteRenderer>().color = wallColor;
+		tile.originalColor = wallColor;
+		tile.originalSprite = wallSprite;
+	}
+
+	public void ChangeToFloor(Tile tile)
+	{
+		tile.obj.GetComponent<SpriteRenderer>().sprite = floorSprite;
+		tile.isWall = false;
+		tile.obj.GetComponent<SpriteRenderer>().color = floorColor;
+		tile.originalColor = floorColor;
+		tile.originalSprite = floorSprite;
 	}
 }

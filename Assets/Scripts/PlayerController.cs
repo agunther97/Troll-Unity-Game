@@ -34,75 +34,57 @@ public class PlayerController : MonoBehaviour {
 
 	void FixedUpdate() {
 		if (moveNorth) {
-			if (PlayerMovement('n')) {
+			if (PlayerMovementCheck('n')) {
 				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
 			}
 			moveNorth = false;
 		} else if (moveEast) {
-			if (PlayerMovement('e')) {
+			if (PlayerMovementCheck('e')) {
 				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
 			}
 			moveEast = false;
 		} else if (moveWest) {
-			if (PlayerMovement('w')) {
+			if (PlayerMovementCheck('w')) {
 				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
 			}
 			moveWest = false;
 		} else if (moveSouth) {
-			if (PlayerMovement('s')) {
+			if (PlayerMovementCheck('s')) {
 				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
 			}
 			moveSouth = false;
 		}
 	}
 
-	private bool PlayerMovement(char direction)
+	private Tile PlayerMovement(Tile playerTile, Tile newPlayerTile)
 	{
+		playerTile.obj.GetComponent<Transform> ().rotation = Quaternion.identity;
+		playerTile.obj.GetComponent<SpriteRenderer> ().sprite = playerTile.originalSprite;
+		newPlayerTile.obj.GetComponent<SpriteRenderer> ().sprite = playerSprite;
+		return newPlayerTile;
+	}
+
+	private bool pushedNorthBefore = false;
+	private bool pushedSouthBefore = false;
+	private bool pushedWestBefore = false;
+	private bool pushedEastBefore = false;
+
+	private bool PlayerMovementCheck(char direction)
+	{
+		Tile possiblePushRecieveTile;
 		bool pass = false;
 		switch (direction) {
 			case 'n':
-				if (!grid.GetNorthTile(playerTile).isWall) {
-					playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
-					pass = true;
-					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerTile.originalSprite;
-					playerTile = grid.GetNorthTile(playerTile);
-					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerSprite;
-				}
-				playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
-				playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 0.0f);
+				pass = NorthMovement();
 				break;
 			case 's':
-				if (!grid.GetSouthTile(playerTile).isWall) {
-					playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
-					pass = true;
-					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerTile.originalSprite;
-					playerTile = grid.GetSouthTile(playerTile);
-					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerSprite;
-				}
-				playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
-				playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 180.0f);
+				pass = SouthMovement();
 				break;
 			case 'e':
-				if (!grid.GetEastTile(playerTile).isWall) {
-					playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
-					pass = true;
-					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerTile.originalSprite;
-					playerTile = grid.GetEastTile(playerTile);
-					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerSprite;
-				}
-				playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
-				playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 90.0f);
+				pass = EastMovement();
 				break;
 			case 'w':
-				if(!grid.GetWestTile(playerTile).isWall) {
-					playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
-					pass = true;
-					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerTile.originalSprite;
-					playerTile = grid.GetWestTile(playerTile);
-					playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerSprite;
-				}
-				playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
-				playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, -90.0f);
+				pass = WestMovement();
 				break;
 			default:
 				Debug.Log("Error, invalid direction supplied");
@@ -110,6 +92,128 @@ public class PlayerController : MonoBehaviour {
 		}
 		vision.CalculatePlayerVisibility(playerTile);
 		return pass;
+	}
+
+	private bool NorthMovement()
+	{
+		bool pass = false;
+		Tile possiblePushRecieveTile;
+
+		pushedEastBefore = false;
+		pushedWestBefore = false;
+		pushedSouthBefore = false;
+
+		if (!grid.GetNorthTile(playerTile).isWall) {
+			pass = true;
+			playerTile = PlayerMovement(playerTile, grid.GetNorthTile(playerTile));	
+		} else {
+			if (pushedNorthBefore) {
+				possiblePushRecieveTile = grid.GetNorthTile(grid.GetNorthTile(playerTile)); 
+				if (!possiblePushRecieveTile.isWall) {
+					pass = true;
+					PushWall(possiblePushRecieveTile, grid.GetNorthTile(playerTile));
+					playerTile = PlayerMovement(playerTile, grid.GetNorthTile(playerTile));
+				}
+			} else {
+				pushedNorthBefore = true;
+			}
+		}
+		playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
+		playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 0.0f);
+		return pass;
+	}
+
+	private bool SouthMovement()
+	{
+		bool pass = false;
+		Tile possiblePushRecieveTile;
+
+		pushedEastBefore = false;
+		pushedWestBefore = false;
+		pushedNorthBefore = false;
+
+		if (!grid.GetSouthTile(playerTile).isWall) {
+			pass = true;
+			playerTile = PlayerMovement(playerTile, grid.GetSouthTile(playerTile));
+		} else {
+			if (pushedSouthBefore) {
+				possiblePushRecieveTile = grid.GetSouthTile(grid.GetSouthTile(playerTile));
+				if (!possiblePushRecieveTile.isWall) {
+					pass = true;
+					PushWall(possiblePushRecieveTile, grid.GetSouthTile(playerTile));
+					playerTile = PlayerMovement(playerTile, grid.GetSouthTile(playerTile));
+				}
+			} else {
+				pushedSouthBefore = true;
+			}
+		}
+		playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
+		playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 180.0f);
+		return pass;
+	}
+
+	private bool EastMovement()
+	{
+		bool pass = false;
+		Tile possiblePushRecieveTile;
+
+		pushedSouthBefore = false;
+		pushedNorthBefore = false;
+		pushedWestBefore = false;
+
+		if (!grid.GetEastTile(playerTile).isWall) {
+			pass = true;
+			playerTile = PlayerMovement(playerTile, grid.GetEastTile(playerTile));
+		} else {
+			if (pushedEastBefore) {
+				possiblePushRecieveTile = grid.GetEastTile(grid.GetEastTile(playerTile));
+				if (!possiblePushRecieveTile.isWall) {
+					pass = true;
+					PushWall(possiblePushRecieveTile, grid.GetEastTile(playerTile));
+					playerTile = PlayerMovement(playerTile, grid.GetEastTile(playerTile));
+				}
+			} else {
+				pushedEastBefore = true;
+			}
+		}
+		playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
+		playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, 90.0f);
+		return pass;
+	}
+
+	private bool WestMovement()
+	{
+		bool pass = false;
+		Tile possiblePushRecieveTile;
+
+		pushedSouthBefore = false;
+		pushedNorthBefore = false;
+		pushedEastBefore = false;
+
+		if (!grid.GetWestTile(playerTile).isWall) {
+			pass = true;
+			playerTile = PlayerMovement(playerTile, grid.GetWestTile(playerTile));
+		} else {
+			if (pushedWestBefore) {
+				possiblePushRecieveTile = grid.GetWestTile(grid.GetWestTile(playerTile));
+				if (!possiblePushRecieveTile.isWall) {
+					pass = true;
+					PushWall(possiblePushRecieveTile, grid.GetWestTile(playerTile));
+					playerTile = PlayerMovement(playerTile, grid.GetWestTile(playerTile));
+				}
+			} else {
+				pushedWestBefore = true;
+			}
+		}
+		playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
+		playerTile.obj.GetComponent<Transform>().Rotate(0.0f, 0.0f, -90.0f);
+		return pass;
+	}
+
+	void PushWall(Tile possiblePushRecieveTile, Tile newFloorTile)
+	{
+		grid.ChangeToWall(possiblePushRecieveTile);
+		grid.ChangeToFloor(newFloorTile);
 	}
 }
 

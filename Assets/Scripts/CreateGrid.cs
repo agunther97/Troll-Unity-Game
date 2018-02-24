@@ -20,7 +20,7 @@ public class CreateGrid : MonoBehaviour
 
 	public void Awake()
 	{
-		grid = new Grid(rows, cols);
+		grid = new Grid(rows, cols, floorSprite, new Color32(86, 86, 86, 255), wallSprite, new Color32(144, 144, 144, 255));
 		map = grid.GetMap();
 		MazeDriver();
 		playerController.GetComponent<PlayerController>().StartUp(playerTile, grid);
