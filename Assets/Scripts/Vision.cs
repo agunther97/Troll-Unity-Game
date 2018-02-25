@@ -96,7 +96,6 @@ public class Vision {
 				Reveal(validRowTile);
 			}
 		}
-		origin.obj.GetComponent<SpriteRenderer>().color = Color.yellow;
 	}
 
 	private List<Tile> GetNorthSouthValidTilesInRange(int range, Tile origin)

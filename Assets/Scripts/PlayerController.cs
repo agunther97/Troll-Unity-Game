@@ -9,7 +9,8 @@ public class PlayerController : MonoBehaviour {
 	private char movementDirection = 'x';
 	public Camera playerCam;
 	public Sprite playerSprite;
-	bool moveNorth = false, moveEast = false, moveWest = false, moveSouth = false;
+	private bool moveNorth = false, moveEast = false, moveWest = false, moveSouth = false;
+	private bool hasLaser;
 
 	public void StartUp(Tile p_playerTile, Grid p_grid)
 	{
@@ -19,6 +20,7 @@ public class PlayerController : MonoBehaviour {
 		vision = new Vision(grid, playerTile.obj.GetComponent<SpriteRenderer>().sprite);
 		playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
 		vision.CalculatePlayerVisibility(playerTile);
+		playerTile.obj.GetComponent<SpriteRenderer>().color = Color.yellow;
 	}
 
 	void Update () {
@@ -92,8 +94,14 @@ public class PlayerController : MonoBehaviour {
 		}
 		if (pass) {
 			vision.CalculatePlayerVisibility(playerTile);
-			if (playerTile.isLazer) {
-				grid.CollectLazer(playerTile);
+			if (playerTile.isLaser) {
+				grid.CollectLaser(playerTile);
+				hasLaser = true;
+			}
+			if (hasLaser) {
+				playerTile.obj.GetComponent<SpriteRenderer>().color = Color.blue;
+			} else {
+				playerTile.obj.GetComponent<SpriteRenderer>().color = Color.yellow;
 			}
 		}
 		return pass;

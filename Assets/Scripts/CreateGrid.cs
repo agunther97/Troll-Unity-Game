@@ -16,7 +16,7 @@ public class CreateGrid : MonoBehaviour
 	public GameObject playerController;
 	public Sprite wallSprite;
 	public Sprite floorSprite;
-	public Sprite lazerSprite;
+	public Sprite laserSprite;
 	//the rows and cols of our grid
 
 	public void Awake()
@@ -34,7 +34,7 @@ public class CreateGrid : MonoBehaviour
 		PopulateMapWithWalls();
 		GenerateMaze();
 		ChangeSprites();
-		SpawnLazers();
+		SpawnLasers();
 		SpawnTrolls();
 	}
 
@@ -219,23 +219,24 @@ public class CreateGrid : MonoBehaviour
 		}
 	}
 		
-	private void SpawnLazers()
+	private void SpawnLasers()
 	{
 		int totalTiles = rows * cols;
 		int numberOfLasers = totalTiles / 100;
 		numberOfLasers -= 5;
 		if (numberOfLasers < 0)
 			numberOfLasers = 1;
+		Debug.Log("Spawning " + numberOfLasers + " lasers");
 		for (int i = 0; i < numberOfLasers; i++) {
 			Tile randomTile = GetRandomTile();
 			while (randomTile.isWall) {
 				randomTile = GetRandomTile();
 			}
-			randomTile.obj.GetComponent<SpriteRenderer>().sprite = lazerSprite;
+			randomTile.obj.GetComponent<SpriteRenderer>().sprite = laserSprite;
 			randomTile.obj.GetComponent<SpriteRenderer>().color = Color.blue;
-			randomTile.originalSprite = lazerSprite;
+			randomTile.originalSprite = laserSprite;
 			randomTile.originalColor = Color.blue;
-			randomTile.isLazer = true;
+			randomTile.isLaser = true;
 		}
 	}
 
