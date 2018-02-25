@@ -94,7 +94,7 @@ public class PlayerController : MonoBehaviour {
 		}
 		if (pass) {
 			vision.CalculatePlayerVisibility(playerTile);
-			if (playerTile.isLaser) {
+			if (playerTile.isLaser && !hasLaser) {
 				grid.CollectLaser(playerTile);
 				hasLaser = true;
 			}

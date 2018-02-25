@@ -140,13 +140,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 135778ea21b3b3449b36ecbb4d2e1681, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rows: 11
-  cols: 11
+  rows: 51
+  cols: 51
   tileObject: {fileID: 1779316975742674, guid: 65432439f62a767439b4ce5927b4d7f2, type: 2}
   container: {fileID: 1506280022}
   playerController: {fileID: 1849592546}
   wallSprite: {fileID: 21300002, guid: 994d141b0df3f0b448ba395243201134, type: 3}
   floorSprite: {fileID: 21300010, guid: 994d141b0df3f0b448ba395243201134, type: 3}
+  laserSprite: {fileID: 21300006, guid: 994d141b0df3f0b448ba395243201134, type: 3}
+  trollSprite: {fileID: 21300004, guid: 994d141b0df3f0b448ba395243201134, type: 3}
 --- !u!4 &1280482085
 Transform:
   m_ObjectHideFlags: 0

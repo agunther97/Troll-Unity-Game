@@ -17,6 +17,7 @@ public class CreateGrid : MonoBehaviour
 	public Sprite wallSprite;
 	public Sprite floorSprite;
 	public Sprite laserSprite;
+	public Sprite trollSprite;
 	//the rows and cols of our grid
 
 	public void Awake()
@@ -245,5 +246,16 @@ public class CreateGrid : MonoBehaviour
 		int totalTiles = rows * cols;
 		int numberOfTrolls = totalTiles / 100;
 		Debug.Log("Spawning " + numberOfTrolls + " trolls");
+		for (int i = 0; i < numberOfTrolls; i++) {
+			Tile randomTile = GetRandomTile();
+			while (randomTile.isWall || randomTile.isLaser || randomTile == playerTile) {
+				randomTile = GetRandomTile();
+			}
+			randomTile.obj.GetComponent<SpriteRenderer>().sprite = trollSprite;
+			randomTile.obj.GetComponent<SpriteRenderer>().color = Color.red;
+			randomTile.originalSprite = trollSprite;
+			randomTile.originalColor = Color.red;
+			randomTile.isTroll = true;
+		}
 	}
 }
