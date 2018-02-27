@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour {
 	private Tile playerTile;
@@ -73,7 +74,6 @@ public class PlayerController : MonoBehaviour {
 
 	private bool PlayerMovementCheck(char direction)
 	{
-		Tile possiblePushRecieveTile;
 		bool pass = false;
 		switch (direction) {
 			case 'n':
@@ -94,17 +94,36 @@ public class PlayerController : MonoBehaviour {
 		}
 		if (pass) {
 			vision.CalculatePlayerVisibility(playerTile);
-			if (playerTile.isLaser && !hasLaser) {
-				grid.CollectLaser(playerTile);
-				hasLaser = true;
-			}
-			if (hasLaser) {
-				playerTile.obj.GetComponent<SpriteRenderer>().color = Color.blue;
-			} else {
-				playerTile.obj.GetComponent<SpriteRenderer>().color = Color.yellow;
-			}
+			CheckForLaser(playerTile);
+			CheckForTroll(playerTile);
 		}
 		return pass;
+	}
+
+	private void CheckForLaser(Tile playerTile)
+	{
+		if (playerTile.isLaser && !hasLaser) {
+			grid.CollectLaser(playerTile);
+			hasLaser = true;
+		}
+		if (hasLaser) {
+			playerTile.obj.GetComponent<SpriteRenderer>().color = Color.blue;
+		} else {
+			playerTile.obj.GetComponent<SpriteRenderer>().color = Color.yellow;
+		}	
+	}
+
+	private void CheckForTroll(Tile playerTile)
+	{
+		if (playerTile.isTroll) {
+			lose();
+		}
+	}
+
+	private void lose()
+	{
+		print("Trying to load");
+		SceneManager.LoadScene("Resources/Scenes/New Main");
 	}
 
 	private bool NorthMovement()

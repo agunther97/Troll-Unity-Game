@@ -81,6 +81,7 @@ public class Grid {
 		tile.obj.GetComponent<SpriteRenderer>().color = floorColor;
 		tile.originalColor = floorColor;
 		tile.originalSprite = floorSprite;
+		tile.isTroll = false;
 	}
 
 	public void CollectLaser(Tile tile)
