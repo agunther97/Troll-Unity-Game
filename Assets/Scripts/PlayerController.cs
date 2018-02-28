@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour {
 	public Camera playerCam;
 	public Sprite playerSprite;
 	private bool moveNorth = false, moveEast = false, moveWest = false, moveSouth = false;
-	private bool hasLaser;
+	private bool hasLaser = false, shootLaser = false;
 
 	public void StartUp(Tile p_playerTile, Grid p_grid)
 	{
@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour {
 			moveSouth = true;
 		else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
 			moveNorth = true;
+		else if (Input.GetKeyDown(KeyCode.Space))
+			shootLaser = true;
 	}
 
 	void FixedUpdate() {
@@ -56,9 +58,17 @@ public class PlayerController : MonoBehaviour {
 				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
 			}
 			moveSouth = false;
+		} else if (shootLaser) {
+			ShootLaser();
+			shootLaser = false;
 		}
 	}
 
+	private void ShootLaser()
+	{
+		print("Shooting laser");
+	}
+	
 	private Tile PlayerMovement(Tile playerTile, Tile newPlayerTile)
 	{
 		playerTile.obj.GetComponent<Transform> ().rotation = Quaternion.identity;
