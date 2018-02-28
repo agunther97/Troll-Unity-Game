@@ -12,6 +12,7 @@ public class PlayerController : MonoBehaviour {
 	public Sprite playerSprite;
 	private bool moveNorth = false, moveEast = false, moveWest = false, moveSouth = false;
 	private bool hasLaser = false, shootLaser = false;
+	private bool facingNorth = false, facingSouth = false, facingEast = false, facingWest = false;
 
 	public void StartUp(Tile p_playerTile, Grid p_grid)
 	{
@@ -58,14 +59,16 @@ public class PlayerController : MonoBehaviour {
 				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
 			}
 			moveSouth = false;
-		} else if (shootLaser) {
+		} else if (shootLaser && hasLaser) {
 			ShootLaser();
 			shootLaser = false;
+			playerTile.obj.GetComponent<SpriteRenderer>().color = Color.yellow;
 		}
 	}
 
 	private void ShootLaser()
 	{
+		hasLaser = false;
 		print("Shooting laser");
 	}
 	
@@ -120,7 +123,7 @@ public class PlayerController : MonoBehaviour {
 			playerTile.obj.GetComponent<SpriteRenderer>().color = Color.blue;
 		} else {
 			playerTile.obj.GetComponent<SpriteRenderer>().color = Color.yellow;
-		}	
+		}
 	}
 
 	private void CheckForTroll(Tile playerTile)
@@ -146,8 +149,10 @@ public class PlayerController : MonoBehaviour {
 		pushedSouthBefore = false;
 
 		if (!grid.GetNorthTile(playerTile).isWall) {
-			pass = true;
-			playerTile = PlayerMovement(playerTile, grid.GetNorthTile(playerTile));	
+			//if (facingNorth) {
+				pass = true;
+				playerTile = PlayerMovement(playerTile, grid.GetNorthTile(playerTile));	
+			//}
 		} else {
 			if (pushedNorthBefore) {
 				if (!grid.GetNorthTile(playerTile).isEdge) {
