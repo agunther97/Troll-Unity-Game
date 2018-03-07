@@ -7,15 +7,16 @@ public class PlayerController : MonoBehaviour {
 	private Tile playerTile;
 	private Grid grid;
 	private Vision vision;
-	private char movementDirection = 'x';
 	public Camera playerCam;
 	public Sprite playerSprite;
-	private bool moveNorth = false, moveEast = false, moveWest = false, moveSouth = false;
+	private bool rotate = true;
+	private List<bool> movements;
 	private bool hasLaser = false, shootLaser = false;
-	private bool facingNorth = false, facingSouth = false, facingEast = false, facingWest = false;
+	private List<Vector3> rotations;
 
-	public void StartUp(Tile p_playerTile, Grid p_grid)
-	{
+	public void StartUp(Tile p_playerTile, Grid p_grid) {
+		movements = new List<bool>() {false, false, false, false}; 
+		rotations = new List<Vector3>() {new Vector3(0.0f, 0.0f, 0.0f), new Vector3(0.0f, 0.0f, 180.0f), new Vector3(0.0f, 0.0f, -90.0f), new Vector3(0.0f, 0.0f, 90.0f)};
 		playerTile = p_playerTile;
 		grid = p_grid;
 		playerTile.obj.GetComponent<SpriteRenderer>().sprite = playerSprite;
@@ -26,39 +27,59 @@ public class PlayerController : MonoBehaviour {
 	}
 
 	void Update () {
-		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
-			moveEast = true;
-		else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
-			moveWest = true;
-		else if (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A))
-			moveSouth = true;
-		else if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
-			moveNorth = true;
-		else if (Input.GetKeyDown(KeyCode.Space))
-			shootLaser = true;
+		bool up = (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W));
+		bool down = (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S));
+		bool left = (Input.GetKeyDown(KeyCode.LeftArrow) || Input.GetKeyDown(KeyCode.A));
+		bool right = (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D));
+		bool shift = Input.GetKey(KeyCode.LeftShift);
+		List<bool> directions = new List<bool>() { right, left, down, up };
+		if (shift && (right || left || down || up)) { // rotate instead of moving
+//			for (int i = 0; i < 4; i++) {
+//				movements[i] = false;
+//			}
+			for (int i = 0; i < 4; i++) {
+				if (directions[i]) {
+					rotate = true;
+					playerTile.obj.GetComponent<Transform>().rotation = Quaternion.identity;
+					playerTile.obj.GetComponent<Transform>().Rotate(rotations[i]);
+					return;
+				}
+			}
+		} else {
+			if (up || down || left || right) {
+				for (int i = 0; i < 4; i++) {
+					if (directions[i]) {
+						movements[i] = true;
+						return;
+					}
+				}
+			}
+			if (Input.GetKeyDown(KeyCode.Space))
+				shootLaser = true;
+		}
 	}
 
 	void FixedUpdate() {
-		if (moveNorth) {
+		if (movements[0]) {
 			if (PlayerMovementCheck('n')) {
 				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
 			}
-			moveNorth = false;
-		} else if (moveEast) {
+			movements[0] = false;
+		} else if (movements[3]) {
 			if (PlayerMovementCheck('e')) {
 				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
 			}
-			moveEast = false;
-		} else if (moveWest) {
+			movements[3] = false;
+		} else if (movements[2]) {
 			if (PlayerMovementCheck('w')) {
 				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
 			}
-			moveWest = false;
-		} else if (moveSouth) {
+			movements[2] = false;
+		} else if (movements[1]) {
 			if (PlayerMovementCheck('s')) {
 				playerCam.GetComponent<CameraFollow>().SetTarget(playerTile.obj.GetComponent<Transform>());
 			}
-			moveSouth = false;
+			movements[1] = false;
 		} else if (shootLaser && hasLaser) {
 			ShootLaser();
 			shootLaser = false;
@@ -149,10 +170,8 @@ public class PlayerController : MonoBehaviour {
 		pushedSouthBefore = false;
 
 		if (!grid.GetNorthTile(playerTile).isWall) {
-			//if (facingNorth) {
 				pass = true;
 				playerTile = PlayerMovement(playerTile, grid.GetNorthTile(playerTile));	
-			//}
 		} else {
 			if (pushedNorthBefore) {
 				if (!grid.GetNorthTile(playerTile).isEdge) {
